@@ -9,6 +9,23 @@ from argparse import ArgumentParser
 import pandas
 import ezodf
 
+from nltk.tokenize import RegexpTokenizer
+from nltk.corpus import stopwords
+
+from sklearn.ensemble import RandomForestClassifier
+from xgboost import XGBClassifier
+from sklearn.model_selection import cross_val_score
+
+stop_words = stopwords.words('french')
+tknzr = RegexpTokenizer('\w+')
+
+
+def transform_text(t):
+    result = [ a.lower() for a in tknzr.tokenize(t) if (len(a)>1 and a.lower() not in stop_words) ]
+    #result.sort()
+    return result
+
+
 if __name__ == '__main__':
 
     Parser = ArgumentParser()
@@ -46,4 +63,21 @@ if __name__ == '__main__':
     # and convert to a DataFrame
     df = pandas.DataFrame(df_dict)
 
+    df['Crédit'].fillna(value=0, inplace=True)
+    df['Débit'].fillna(value=0, inplace=True)
+    df['Montant'] = df['Crédit'] - df['Débit']
+    df.dropna(axis=0, inplace=True)
+
+    for col in ['Retour', 'Réel', 'Montant LB', 'Conversion F', 'Débit', 'Crédit', ]:
+        df.drop(col, axis=1, inplace=True)
+
+    tmp = df["Nature de l'opération"].map(transform_text).apply(pandas.Series).rename(columns = lambda x : 'mot_' + str(x))
+    #print(df.head())
+
+    Y = df['Nature']
+    X = pandas.concat([df.drop("Nature de l'opération", axis=1), tmp], axis=1)
+    #print(X.head(), Y.head())
+
+    print(cross_val_score(XGBClassifier(n_estimators=10), X, Y, scoring='neg_log_loss', cv=10, n_jobs=-1, verbose=1))
+    print(cross_val_score(RandomForestClassifier(n_estimators=10), X, Y, scoring='neg_log_loss', cv=10, n_jobs=-1, verbose=1))
 
