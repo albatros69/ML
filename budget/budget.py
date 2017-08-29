@@ -12,16 +12,21 @@ import ezodf
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
-from sklearn.model_selection import cross_val_score
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import cross_val_score, train_test_split
+
 
 stop_words = stopwords.words('french')
 tknzr = RegexpTokenizer('\w+')
 
 
 def transform_text(t):
-    result = [ a.lower() for a in tknzr.tokenize(t) if (len(a)>1 and a.lower() not in stop_words) ]
+    result = [ a.lower() for a in tknzr.tokenize(t)
+            if (len(a)>1 and a.lower() not in stop_words) ]
     #result.sort()
     return result
 
@@ -63,21 +68,57 @@ if __name__ == '__main__':
     # and convert to a DataFrame
     df = pandas.DataFrame(df_dict)
 
+    # On combine Crédit et Débit en une seule colonne
     df['Crédit'].fillna(value=0, inplace=True)
     df['Débit'].fillna(value=0, inplace=True)
     df['Montant'] = df['Crédit'] - df['Débit']
+
+    for col in [ 'Retour', 'Réel', 'Montant LB', 'Conversion F', 'Débit', 'Crédit', ]:
+        df.drop(col, axis=1, inplace=True)
+    # Suppression de cette catégorie
+    df = df[df['Nature'] != 'Revenus divers']
     df.dropna(axis=0, inplace=True)
 
-    for col in ['Retour', 'Réel', 'Montant LB', 'Conversion F', 'Débit', 'Crédit', ]:
+    # Transformation de la date en trois colonnes
+    df_date = df['Date'].map(lambda x: x[:10].split('-')).apply(pandas.Series).astype(int)\
+            .rename(columns=lambda x: {0:'Année', 1:'Mois', 2:'Jour'}[x] )
+
+    # Traitement de la colonne de texte
+    #df_OpDescr = df["Nature de l'opération"].map(transform_text).apply(pandas.Series).rename(columns = lambda x : 'mot_' + str(x))
+    vctzr = CountVectorizer(min_df=10, stop_words=stop_words, lowercase=True)
+    OpDescr = vctzr.fit_transform(df["Nature de l'opération"].tolist())
+    df_OpDescr = pandas.DataFrame(OpDescr.A, columns=vctzr.get_feature_names(), index=df.index)
+    categ_words = vctzr.get_feature_names()
+
+    for col in [ 'Date', "Nature de l'opération", ]:
         df.drop(col, axis=1, inplace=True)
 
-    tmp = df["Nature de l'opération"].map(transform_text).apply(pandas.Series).rename(columns = lambda x : 'mot_' + str(x))
-    #print(df.head())
+    # Traduction des catégories en index
+    #categories = df['Nature'].unique()
+    #categories = dict(zip(range(len(categories)), categories))
 
+    X = df.drop('Nature', axis=1)
+    X = pandas.concat([X, df_OpDescr, df_date], axis=1)
+    #Y = df['Nature'].map(lambda x: categories.values().index(x)).astype(int)
+    #le = LabelEncoder()
+    #Y = le.fit_transform(df['Nature'])
     Y = df['Nature']
-    X = pandas.concat([df.drop("Nature de l'opération", axis=1), tmp], axis=1)
-    #print(X.head(), Y.head())
 
-    print(cross_val_score(XGBClassifier(n_estimators=10), X, Y, scoring='neg_log_loss', cv=10, n_jobs=-1, verbose=1))
-    print(cross_val_score(RandomForestClassifier(n_estimators=10), X, Y, scoring='neg_log_loss', cv=10, n_jobs=-1, verbose=1))
+    model = RandomForestClassifier()
+    X_train, X_test, Y_train, Y_true = train_test_split(X, Y, test_size=0.1)
+    model.fit(X_train, Y_train)
+    Y_pred = pandas.DataFrame(model.predict(X_test), index=Y_true.index)
+    print("Accuracy: %0.3f" % (accuracy_score(Y_true, Y_pred, normalize=True), ))
+
+    #scores = cross_val_score(XGBClassifier(n_estimators=20), X, Y, scoring='accuracy', cv=20, n_jobs=-1, verbose=1)
+    #print("XGB CV Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
+    scores = cross_val_score(RandomForestClassifier(n_estimators=20), X, Y, scoring='accuracy', cv=20, n_jobs=4, verbose=1)
+    print("RF CV Accuracy: %0.3f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
+
+    data = [
+            { "Date": "2017-09-01", "Nature de l'opération": "Bioplaisir", "Débit": 34.23, "Crédit": 0 },
+            { "Date": "2017-09-03", "Nature de l'opération": "Mur de Lyon", "Débit": 334.23, "Crédit": 0 },
+            { "Date": "2017-09-05", "Nature de l'opération": "Remboursement CPA", "Débit": 0, "Crédit": 14.2 },
+           ]
+    #for a in data:
 
