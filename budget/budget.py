@@ -91,7 +91,11 @@ if __name__ == '__main__':
         model.fit(X, Y)
         model.categ_words = categ_words
         model.features_list = list(X)
-        with gzip.open("%s.gz" % (Args.dump, ), 'wb') as dump_file:
+
+        fic_name = Args.dump
+        if not fic_name.endswith('.gz'):
+            fic_name += '.gz'
+        with gzip.open(fic_name, 'wb') as dump_file:
             pickle.dump(model, dump_file)
     else:
         #X_train, X_test, Y_train, Y_true = train_test_split(X, Y, test_size=0.1)
