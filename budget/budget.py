@@ -7,6 +7,7 @@ from __future__ import (unicode_literals, absolute_import, print_function, divis
 from argparse import ArgumentParser
 
 import re
+import gzip
 
 import pandas
 import numpy
@@ -19,9 +20,10 @@ from sklearn.feature_extraction.text import CountVectorizer
 #from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
 #from xgboost import XGBClassifier
-#from sklearn.metrics import accuracy_score
-#from sklearn.model_selection import cross_val_score, train_test_split
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import cross_val_score, train_test_split
 
+import cPickle as pickle
 
 stop_words = stopwords.words('french')
 tknzr = RegexpTokenizer('\w+')
@@ -39,6 +41,8 @@ if __name__ == '__main__':
     Parser = ArgumentParser()
     Parser.add_argument("file", action="store", metavar='FILE',
                         help="Load data from this file.")
+    Parser.add_argument("-d", "--dump", dest="dump", action="store",
+                        help="Dump the model as a Pickle file.")
     Args = Parser.parse_args()
 
     doc = ezodf.opendoc(Args.file)
@@ -107,35 +111,22 @@ if __name__ == '__main__':
     #Y = le.fit_transform(df['Nature'])
     Y = df['Nature']
 
-    model = RandomForestClassifier()
-    #X_train, X_test, Y_train, Y_true = train_test_split(X, Y, test_size=0.1)
-    #model.fit(X_train, Y_train)
-    #Y_pred = pandas.DataFrame(model.predict(X_test), index=Y_true.index)
-    #print(X_test.head())
-    #print("Accuracy: %0.3f" % (accuracy_score(Y_true, Y_pred, normalize=True), ))
+    if Args.dump:
+        model = RandomForestClassifier()
+        model.fit(X, Y)
+        model.categ_words = categ_words
+        model.features_list = list(X)
+        with gzip.open("%s.gz" % (Args.dump, ), 'wb') as dump_file:
+            pickle.dump(model, dump_file)
+    else:
+        #X_train, X_test, Y_train, Y_true = train_test_split(X, Y, test_size=0.1)
+        #model.fit(X_train, Y_train)
+        #Y_pred = pandas.DataFrame(model.predict(X_test), index=Y_true.index)
+        #print(X_test.head())
+        #print("Accuracy: %0.3f" % (accuracy_score(Y_true, Y_pred, normalize=True), ))
 
-    #scores = cross_val_score(XGBClassifier(n_estimators=20), X, Y, scoring='accuracy', cv=20, n_jobs=-1, verbose=1)
-    #print("XGB CV Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
-    #scores = cross_val_score(RandomForestClassifier(n_estimators=20), X, Y, scoring='accuracy', cv=20, n_jobs=4, verbose=1)
-    #print("RF CV Accuracy: %0.3f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
-
-    model.fit(X, Y)
-
-    data = [
-            { "Date": "2017-09-01", "Nature de l'opération": "Bioplaisir",         "Débit":  34.23, "Crédit":  0 },
-            { "Date": "2017-09-03", "Nature de l'opération": "Mur de Lyon",        "Débit": 334.23, "Crédit":  0 },
-            { "Date": "2017-09-05", "Nature de l'opération": "Remboursement CPAM", "Débit":   0,    "Crédit": 14.2 },
-           ]
-    for a in data:
-        tmp = dict(zip([u'Année', u'Mois', u'Jour'], map(int, a['Date'][:10].split('-'))))
-        tmp['Montant'] = a['Crédit'] - a['Débit']
-        #tmp['Montant'] = getattr(a, 'Crédit', 0.0) - getattr(a, 'Débit', 0.0)
-        words = map(lambda s: s.lower(), re.split('\W+', a["Nature de l'opération"]))
-        for w in categ_words:
-            if w in words:
-                tmp[w] = 1
-            else:
-                tmp[w] = 0
-        result = model.predict([ [ tmp[c] for c in list(X) ] ])
-        print("%s => %s" % (a, result))
+        #scores = cross_val_score(XGBClassifier(n_estimators=20), X, Y, scoring='accuracy', cv=20, n_jobs=-1, verbose=1)
+        #print("XGB CV Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
+        scores = cross_val_score(RandomForestClassifier(n_estimators=20), X, Y, scoring='accuracy', cv=20, n_jobs=4, verbose=1)
+        print("RF CV Accuracy: %0.3f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
 
