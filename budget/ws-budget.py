@@ -8,7 +8,8 @@ import re
 import gzip
 import cPickle as pickle
 
-#import flask
+import flask
+from flask import Flask, render_template, request, redirect, url_for, g
 
 
 with gzip.open('model-budget.pkl.gz', 'rb') as model_dump:
@@ -17,13 +18,13 @@ with gzip.open('model-budget.pkl.gz', 'rb') as model_dump:
 
 def transform_budget_data(data, categ_words):
     # Transformation de la date
-    result = dict(zip([u'Année', u'Mois', u'Jour'], map(int, data['Date'][:10].split('-'))))
+    result = dict(zip(['année', 'mois', 'jour'], map(int, data['date'][:10].split('-'))))
 
     # Calcul du montant de l'opération
-    result['Montant'] = data['Crédit'] - data['Débit']
+    result['montant'] = float('0'+data['credit'].replace(',', '.')) - float('0'+data['debit'].replace(',', '.'))
 
     # Traitement du texte de description (selon les mots utilisés par le modèle)
-    words = map(lambda s: s.lower(), re.split('\W+', data["Nature de l'opération"]))
+    words = map(lambda s: s.lower(), re.split('\W+', data["nature"]))
     for w in categ_words:
         if w in words:
             result[w] = 1
@@ -32,16 +33,32 @@ def transform_budget_data(data, categ_words):
 
     return result
 
+app = Flask(__name__)
+
+@app.route("/budget/", methods = ('GET', ))
+def predict_categ_accounting():
+    if all([ c in request.args for c in ('date', 'debit', 'credit', 'nature')]):
+        tmp = transform_budget_data(request.args, model_budget.categ_words)
+        result = model_budget.predict([ [ tmp[c] for c in model_budget.features_list ] ])
+        return ("%s" % (result[0], ), 200)
+    else:
+        return ('Bad request', 400, )
 
 if __name__ == '__main__':
 
-    data = [
-            { "Date": "2017-09-01", "Nature de l'opération": "Bioplaisir",         "Débit":  34.23, "Crédit":  0 },
-            { "Date": "2017-09-03", "Nature de l'opération": "Mur de Lyon",        "Débit": 334.23, "Crédit":  0 },
-            { "Date": "2017-09-05", "Nature de l'opération": "Remboursement CPAM", "Débit":   0,    "Crédit": 14.2 },
-           ]
-    for a in data:
-        tmp = transform_budget_data(a, model_budget.categ_words)
-        result = model_budget.predict([ [ tmp[c] for c in model_budget.features_list ] ])
-        print("%s => %s" % (a, result))
+    app.run(port=5999, debug=True, host='localhost')
+
+    #http://localhost:5999/budget/?date=2017-09-01&credit=0&debit=34.23&nature=Bioplaisir
+    #http://localhost:5999/budget/?date=2017-09-03&credit=0&debit=334.23&nature=Mur+de+Lyon
+    #http://localhost:5999/budget/?date=2017-09-05&credit=14.2&debit=0&nature=Remboursement+CPAM
+
+    #data = [
+    #        { "date": "2017-09-01", "nature": "Bioplaisir",         "debit":  34.23, "credit":  0 },
+    #        { "date": "2017-09-03", "nature": "Mur de Lyon",        "debit": 334.23, "credit":  0 },
+    #        { "date": "2017-09-05", "nature": "Remboursement CPAM", "debit":   0,    "credit": 14.2 },
+    #       ]
+    #for a in data:
+    #    tmp = transform_budget_data(a, model_budget.categ_words)
+    #    result = model_budget.predict([ [ tmp[c] for c in model_budget.features_list ] ])
+    #    print("%s => %s" % (a, result))
 
