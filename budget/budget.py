@@ -61,7 +61,7 @@ if __name__ == '__main__':
     # On combine Crédit et Débit en une seule colonne
     df['Crédit'].fillna(value=0, inplace=True)
     df['Débit'].fillna(value=0, inplace=True)
-    df['Montant'] = df['Crédit'] - df['Débit']
+    df['montant'] = df['Crédit'] - df['Débit']
 
     for col in [ 'Retour', 'Réel', 'Montant LB', 'Conversion F', 'Débit', 'Crédit', ]:
         df.drop(col, axis=1, inplace=True)
@@ -71,7 +71,7 @@ if __name__ == '__main__':
 
     # Transformation de la date en trois colonnes
     df_date = df['Date'].map(lambda x: x[:10].split('-')).apply(pandas.Series).astype(int)\
-            .rename(columns=lambda x: {0:'Année', 1:'Mois', 2:'Jour'}[x] )
+            .rename(columns=lambda x: {0:'année', 1:'mois', 2:'jour'}[x] )
 
     # Traitement de la colonne de texte
     vctzr = CountVectorizer(min_df=10, stop_words=stop_words, lowercase=True)
