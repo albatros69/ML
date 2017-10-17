@@ -1,0 +1,6 @@
+ezodf
+Flask
+nltk
+pandas
+sklearn
+
