@@ -18,7 +18,7 @@ with gzip.open('model-budget.pkl.gz', 'rb') as model_dump:
 
 def transform_budget_data(data, categ_words):
     # Transformation de la date
-    result = dict(zip(['année', 'mois', 'jour'], map(int, data['date'][:10].split('-'))))
+    result = dict(zip(['jour', 'mois', 'année'], map(int, data['date'][:10].split('/'))))
 
     # Calcul du montant de l'opération
     result['montant'] = float('0'+data['credit'].replace(',', '.')) - float('0'+data['debit'].replace(',', '.'))
