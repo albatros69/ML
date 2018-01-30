@@ -48,14 +48,14 @@ if __name__ == '__main__':
 
     app.run(port=5999, debug=True, host='localhost')
 
-    #http://localhost:5999/budget/?date=2017-09-01&credit=0&debit=34.23&nature=Bioplaisir
-    #http://localhost:5999/budget/?date=2017-09-03&credit=0&debit=334.23&nature=Mur+de+Lyon
-    #http://localhost:5999/budget/?date=2017-09-05&credit=14.2&debit=0&nature=Remboursement+CPAM
+    #http://localhost:5999/budget/?date=01/09/2017&credit=0&debit=34.23&nature=Bioplaisir
+    #http://localhost:5999/budget/?date=03/09/2017&credit=0&debit=334.23&nature=Mur+de+Lyon
+    #http://localhost:5999/budget/?date=05/09/2017&credit=14.2&debit=0&nature=Remboursement+CPAM
 
     #data = [
-    #        { "date": "2017-09-01", "nature": "Bioplaisir",         "debit":  34.23, "credit":  0 },
-    #        { "date": "2017-09-03", "nature": "Mur de Lyon",        "debit": 334.23, "credit":  0 },
-    #        { "date": "2017-09-05", "nature": "Remboursement CPAM", "debit":   0,    "credit": 14.2 },
+    #        { "date": "01/09/2017", "nature": "Bioplaisir",         "debit":  34.23, "credit":  0 },
+    #        { "date": "03/09/2017", "nature": "Mur de Lyon",        "debit": 334.23, "credit":  0 },
+    #        { "date": "05/03/2017", "nature": "Remboursement CPAM", "debit":   0,    "credit": 14.2 },
     #       ]
     #for a in data:
     #    tmp = transform_budget_data(a, model_budget.categ_words)
