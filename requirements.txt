@@ -1,6 +1,8 @@
 ezodf
 Flask
 nltk
+numpy
+scipy
 pandas
 sklearn
 
