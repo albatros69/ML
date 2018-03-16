@@ -9,7 +9,7 @@ import gzip
 import cPickle as pickle
 
 import flask
-from flask import Flask, render_template, request, redirect, url_for, g
+from flask import request
 
 
 with gzip.open('model-budget.pkl.gz', 'rb') as model_dump:
