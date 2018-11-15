@@ -54,12 +54,12 @@ def predict_categ_accounting():
     #http://localhost:5999/budget/?date=05/09/2017&credit=14.2&debit=0&nature=Remboursement+CPAM
 
     #data = [
-    #        { "date": "01/09/2017", "nature": "Bioplaisir",         "debit":  34.23, "credit":  0 },
-    #        { "date": "03/09/2017", "nature": "Mur de Lyon",        "debit": 334.23, "credit":  0 },
-    #        { "date": "05/03/2017", "nature": "Remboursement CPAM", "debit":   0,    "credit": 14.2 },
+    #        { "date": "01/09/2017", "nature": "Bioplaisir",         "debit":  "34,23", "credit":  "0" },
+    #        { "date": "03/09/2017", "nature": "Mur de Lyon",        "debit": "334,23", "credit":  "0" },
+    #        { "date": "05/03/2017", "nature": "Remboursement CPAM", "debit":   "0",    "credit": "14.2" },
     #       ]
     #for a in data:
     #    tmp = transform_budget_data(a, model_budget.categ_words)
-    #    result = model_budget.predict([ [ tmp[c] for c in model_budget.features_list ] ])
-    #    print("%s => %s" % (a, result))
+    #    result = model_budget.predict_proba([ [ tmp[c] for c in model_budget.features_list ] ])
+    #    print("%s => %s" % (a, dict(zip(model_budget.classes_, result[0]))))
 
