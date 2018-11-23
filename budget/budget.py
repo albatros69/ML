@@ -30,7 +30,7 @@ if __name__ == '__main__':
     Parser = ArgumentParser()
     Parser.add_argument("file", action="store", metavar='FILE',
                         help="Load data from this file.")
-    Parser.add_argument("-d", "--dump", dest="dump", action="store",
+    Parser.add_argument("-d", "--dump", dest="dump", action="store", nargs='?', const="model-budget.pkl.gz",
                         help="Dump the model as a Pickle file.")
     Args = Parser.parse_args()
 
