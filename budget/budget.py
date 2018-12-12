@@ -7,7 +7,7 @@ from __future__ import (unicode_literals, absolute_import, print_function, divis
 import re
 import gzip
 from argparse import ArgumentParser
-import cPickle as pickle
+import pickle
 
 import pandas
 import ezodf
@@ -22,7 +22,7 @@ from sklearn.model_selection import cross_val_score, train_test_split
 
 
 stop_words = stopwords.words('french')
-tknzr = RegexpTokenizer('\w+')
+tknzr = RegexpTokenizer(r'\w+')
 
 
 if __name__ == '__main__':

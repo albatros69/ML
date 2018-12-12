@@ -6,7 +6,7 @@ from __future__ import (unicode_literals, absolute_import, print_function, divis
 
 import re
 import gzip
-import cPickle as pickle
+import pickle
 
 import flask
 from flask import request
@@ -24,7 +24,7 @@ def transform_budget_data(data, categ_words):
     result['montant'] = float('0'+data['credit'].replace(',', '.')) - float('0'+data['debit'].replace(',', '.'))
 
     # Traitement du texte de description (selon les mots utilisés par le modèle)
-    words = [ s.lower() for s in re.split('\W+', data["nature"]) ]
+    words = [ s.lower() for s in re.split(r'\W+', data["nature"]) ]
     for w in categ_words:
         if w in words:
             result[w] = 1
@@ -49,9 +49,9 @@ def predict_categ_accounting():
 
     #app.run(port=5999, debug=True, host='localhost')
 
-    #http://localhost:5999/budget/?date=01/09/2017&credit=0&debit=34.23&nature=Bioplaisir
-    #http://localhost:5999/budget/?date=03/09/2017&credit=0&debit=334.23&nature=Mur+de+Lyon
-    #http://localhost:5999/budget/?date=05/09/2017&credit=14.2&debit=0&nature=Remboursement+CPAM
+    #http://localhost:5000/budget/?date=01/09/2017&credit=0&debit=34.23&nature=Bioplaisir
+    #http://localhost:5000/budget/?date=05/09/2017&credit=14.2&debit=0&nature=Remboursement+CPAM
+    #http://localhost:5000/budget/?date=03/09/2017&credit=0&debit=334.23&nature=Mur+de+Lyon
 
     #data = [
     #        { "date": "01/09/2017", "nature": "Bioplaisir",         "debit":  "34,23", "credit":  "0" },
