@@ -92,7 +92,7 @@ if __name__ == '__main__':
     Y = df['Nature']
 
     if Args.dump:
-        model = RandomForestClassifier(n_estimators=20)
+        model = RandomForestClassifier(n_estimators=10)
         model.fit(X, Y)
         model.categ_words = categ_words
         model.features_list = list(X)
