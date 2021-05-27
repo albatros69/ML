@@ -111,6 +111,24 @@ if __name__ == '__main__':
         #print(X_test.head())
         #print("Accuracy: %0.3f" % (accuracy_score(Y_true, Y_pred, normalize=True), ))
 
-        scores = cross_val_score(RandomForestClassifier(n_estimators=20), X, Y, scoring='accuracy', cv=20, n_jobs=4, verbose=1)
-        print("RF CV Accuracy: %0.3f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
+        from sklearn.model_selection import cross_val_score, ShuffleSplit
+        cv = ShuffleSplit(n_splits=20, test_size=0.1)
+        scores = cross_val_score(RandomForestClassifier(n_estimators=10), X, Y, scoring='accuracy', cv=cv, n_jobs=4, verbose=1)
+        print("RandomForest CV Accuracy (testing error): %0.3f (± %0.3f)" % (scores.mean(), scores.std() * 2))
+
+        # from sklearn.model_selection import validation_curve
+        # n_estimators = range(1,16) #range(1,30,2)
+        # train_scores, test_scores = validation_curve(
+        #     RandomForestClassifier(), X, Y, param_name="n_estimators", param_range=n_estimators,
+        #     cv=cv, scoring="accuracy", n_jobs=4, verbose=1)
+
+        # import matplotlib.pyplot as plt
+        # plt.plot(n_estimators, train_scores.mean(axis=1), label="Training score")
+        # plt.plot(n_estimators, test_scores.mean(axis=1), label="Testing score")
+        # plt.legend()
+
+        # plt.xlabel("Number of estimators")
+        # plt.ylabel("Accuracy")
+        # _ = plt.title("Validation curve for Random Forest")
+        # plt.show()
 
