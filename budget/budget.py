@@ -55,6 +55,13 @@ if __name__ == '__main__':
             # use header instead of column index
             if col_index[j]:
                 df_dict[col_index[j]].append(cell.value)
+    sheet = doc.sheets[4] # on ajoute les données Bourso
+    for i, row in enumerate(sheet.rows()):
+        if i <= 2:
+            continue
+        for j, cell in enumerate(row):
+            if col_index[j]:
+                df_dict[col_index[j]].append(cell.value)
     # and convert to a DataFrame
     df = pandas.DataFrame(df_dict)
 
