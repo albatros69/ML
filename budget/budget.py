@@ -33,7 +33,6 @@ if __name__ == '__main__':
     Args = Parser.parse_args()
 
     doc = ezodf.opendoc(Args.file)
-    sheet = doc.sheets[1]
 
     # convert the first sheet to a pandas.DataFrame
     sheet = doc.sheets[1]
@@ -94,6 +93,11 @@ if __name__ == '__main__':
     if Args.dump:
         model = RandomForestClassifier(n_estimators=10)
         model.fit(X, Y)
+
+        # from sklearn.metrics import accuracy_score
+        # Y_pred = model.predict(X)
+        # print("Accuracy (training error): %0.3f" % (accuracy_score(Y, Y_pred, normalize=True), ))
+
         model.categ_words = categ_words
         model.features_list = list(X)
 
@@ -103,6 +107,8 @@ if __name__ == '__main__':
         with gzip.open(fic_name, 'wb') as dump_file:
             pickle.dump(model, dump_file)
     else:
+        # from sklearn.metrics import accuracy_score
+        # from sklearn.model_selection import train_test_split
         #X_train, X_test, Y_train, Y_true = train_test_split(X, Y, test_size=0.1)
         #model.fit(X_train, Y_train)
         #Y_pred = pandas.DataFrame(model.predict(X_test), index=Y_true.index)
