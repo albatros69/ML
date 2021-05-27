@@ -4,7 +4,7 @@
 
 from __future__ import (unicode_literals, absolute_import, print_function, division)
 
-import re
+# import re
 import gzip
 from argparse import ArgumentParser
 import pickle
@@ -17,8 +17,6 @@ from nltk.corpus import stopwords
 
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
-from sklearn.model_selection import cross_val_score, train_test_split
 
 
 stop_words = stopwords.words('french')
