@@ -63,3 +63,6 @@ docs/_build/
 
 #MacOS
 .DS_Store
+
+*.pkl.gz
+settings.json
