@@ -88,10 +88,12 @@ if __name__ == '__main__':
 
     X = df.drop('Nature', axis=1)
     X = pandas.concat([X, df_OpDescr, df_date], axis=1)
+    # print(X.describe())
     Y = df['Nature']
 
+    n_estimators = 50
     if Args.dump:
-        model = RandomForestClassifier(n_estimators=10)
+        model = RandomForestClassifier(n_estimators=n_estimators, n_jobs=-1)
         model.fit(X, Y)
 
         # from sklearn.metrics import accuracy_score
@@ -109,19 +111,22 @@ if __name__ == '__main__':
     else:
         # from sklearn.metrics import accuracy_score
         # from sklearn.model_selection import train_test_split
-        #X_train, X_test, Y_train, Y_true = train_test_split(X, Y, test_size=0.1)
+        #X_train, X_test, Y_train, Y_true = train_test_split(X, Y, test_size=0.1, shuffle=True)
         #model.fit(X_train, Y_train)
         #Y_pred = pandas.DataFrame(model.predict(X_test), index=Y_true.index)
         #print(X_test.head())
-        #print("Accuracy: %0.3f" % (accuracy_score(Y_true, Y_pred, normalize=True), ))
+        #print("Accuracy (testing error): %0.3f" % (accuracy_score(Y_true, Y_pred, normalize=True), ))
+
+        # print(f"# valeurs : {Y.size}", Y.value_counts(), sep='\n')
 
         from sklearn.model_selection import cross_val_score, ShuffleSplit
         cv = ShuffleSplit(n_splits=20, test_size=0.1)
-        scores = cross_val_score(RandomForestClassifier(n_estimators=10), X, Y, scoring='accuracy', cv=cv, n_jobs=4, verbose=1)
-        print("RandomForest CV Accuracy (testing error): %0.3f (± %0.3f)" % (scores.mean(), scores.std() * 2))
+        scores = cross_val_score(RandomForestClassifier(n_estimators=n_estimators, n_jobs=-1), X, Y,
+            scoring='accuracy', cv=cv, n_jobs=-1, verbose=1)
+        print("RandomForest CV Accuracy (testing error): %0.3f (± %0.3f)" % (scores.mean(), scores.std()*2))
 
         # from sklearn.model_selection import validation_curve
-        # n_estimators = range(1,16) #range(1,30,2)
+        # n_estimators = range(1,100,5) #range(1,16) #range(1,30,2)
         # train_scores, test_scores = validation_curve(
         #     RandomForestClassifier(), X, Y, param_name="n_estimators", param_range=n_estimators,
         #     cv=cv, scoring="accuracy", n_jobs=4, verbose=1)

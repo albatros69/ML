@@ -8,7 +8,7 @@ import re
 import gzip
 import pickle
 
-import flask
+# import flask
 from flask import request
 
 
@@ -48,10 +48,7 @@ def predict_categ_accounting():
         result = model_budget.predict([[tmp[c] for c in model_budget.features_list]])
         return ("%s" % (result[0],), 200)
     else:
-        return (
-            "Bad request",
-            400,
-        )
+        return ("Bad request", 400)
 
 
 # if __name__ == '__main__':
