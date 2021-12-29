@@ -11,6 +11,7 @@ instance/
 
 # Distribution / packaging
 .Python
+.venv
 env/
 bin/
 build/
