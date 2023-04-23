@@ -39,6 +39,7 @@ def transform_budget_data(data, categ_words):
 
 
 from app import app
+# app = flask.Flask(__name__)
 
 
 @app.route("/budget/", methods=("GET",))
@@ -55,9 +56,9 @@ def predict_categ_accounting():
 
 #     app.run(port=5999, debug=True, host='localhost')
 
-#     http://localhost:5000/budget/?date=01/09/2017&credit=0&debit=34.23&nature=Bioplaisir
-#     http://localhost:5000/budget/?date=05/09/2017&credit=14.2&debit=0&nature=Remboursement+CPAM
-#     http://localhost:5000/budget/?date=03/09/2017&credit=0&debit=334.23&nature=Mur+de+Lyon
+#     # http://localhost:5999/budget/?date=01/09/2017&credit=0&debit=34.23&nature=Bioplaisir
+#     # http://localhost:5999/budget/?date=05/09/2017&credit=14.2&debit=0&nature=Remboursement+CPAM
+#     # http://localhost:5999/budget/?date=03/09/2017&credit=0&debit=334.23&nature=Mur+de+Lyon
 
 #     data = [
 #            { "date": "01/09/2017", "nature": "Bioplaisir",         "debit":  "34,23", "credit":  "0" },
