@@ -92,7 +92,7 @@ if __name__ == '__main__':
     n_estimators = 50
     if Args.dump:
         model = RandomForestClassifier(n_estimators=n_estimators, n_jobs=-1)
-        model.fit(X, Y)
+        model.fit(X.values, Y.values)
 
         # from sklearn.metrics import accuracy_score
         # Y_pred = model.predict(X)
