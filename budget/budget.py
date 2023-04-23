@@ -12,7 +12,6 @@ import pickle
 import pandas
 import ezodf
 
-from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 
 from sklearn.feature_extraction.text import CountVectorizer
@@ -20,7 +19,6 @@ from sklearn.ensemble import RandomForestClassifier
 
 
 stop_words = stopwords.words('french')
-tknzr = RegexpTokenizer(r'\w+')
 
 
 if __name__ == '__main__':
