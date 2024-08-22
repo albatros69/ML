@@ -5,6 +5,6 @@ nltk
 numpy
 scipy
 pandas
-sklearn
+#sklearn
 scikit-learn
 

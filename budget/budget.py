@@ -61,8 +61,7 @@ if __name__ == '__main__':
     df = pandas.DataFrame(df_dict)
 
     # On combine Crédit et Débit en une seule colonne
-    df['Crédit'].fillna(value=0, inplace=True)
-    df['Débit'].fillna(value=0, inplace=True)
+    df.fillna({'Crédit': 0, 'Débit': 0}, inplace=True)
     df['montant'] = df['Crédit'] - df['Débit']
 
     for col in [ 'Retour', 'Réel', 'Montant LB', 'Conversion F', 'Débit', 'Crédit', ]:
@@ -78,7 +77,7 @@ if __name__ == '__main__':
     # Traitement de la colonne de texte
     vctzr = CountVectorizer(min_df=10, stop_words=stop_words, lowercase=True)
     OpDescr = vctzr.fit_transform(df["Nature de l'opération"].tolist())
-    df_OpDescr = pandas.DataFrame(OpDescr.A, columns=vctzr.get_feature_names_out(), index=df.index)
+    df_OpDescr = pandas.DataFrame(OpDescr.toarray(), columns=vctzr.get_feature_names_out(), index=df.index)
     categ_words = vctzr.get_feature_names_out()
 
     for col in [ 'Date', "Nature de l'opération", ]:
